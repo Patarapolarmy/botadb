@@ -34,7 +34,7 @@ app.post('/api/status', checkApiKeyAndIP, (req, res) => {
   const ipRaw = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const ip = ipRaw.includes(',') ? ipRaw.split(',')[0].trim() : ipRaw.replace(/^::ffff:/, '');
   res.json({
-    status: 'ok',
+    status: 'true',
     message: 'API is running',
     ip,
     timestamp: new Date().toISOString()
