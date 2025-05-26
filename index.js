@@ -1,7 +1,7 @@
 // index.js
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // === ตั้งค่า ===
 const API_KEYS = [
@@ -39,6 +39,10 @@ app.get('/api/status', checkApiKeyAndIP, (req, res) => {
     ip,
     timestamp: new Date().toISOString()
   });
+});
+
+app.get('/', (req, res) => {
+  res.send('OK');
 });
 
 app.listen(port, () => {
