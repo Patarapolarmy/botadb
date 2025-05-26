@@ -1,6 +1,7 @@
 // index.js
 const express = require('express');
 const app = express();
+app.use(express.json());
 const jwt = require('jsonwebtoken');
 const secret = 'k9xarmy1234567890'; // ควรเก็บไว้ใน .env
 const port = process.env.PORT || 3000;
@@ -72,10 +73,9 @@ app.post('/api/get-commands', checkApiKeyAndIP, (req, res) => {
         return res.status(401).json({ error: 'Missing token' });
     }
 
-    device = req.body.device; // ดึงข้อมูล device จาก body
+    const { serial } = req.body || {};
 
-
-    if (!device) {
+    if (!serial) {
         return res.status(400).json({ error: 'Missing device information' });
     }
 
@@ -86,7 +86,7 @@ app.post('/api/get-commands', checkApiKeyAndIP, (req, res) => {
             status: 'true',
             message: 'API is running',
             ip,
-            device,
+            serial,
             commands: [
                 { "command": 'settings', "args": ["put", "global", "development_settings_enabled", "0"] },
                 {  "command": "settings", "args": ["put", "global", "adb_enabled", "2"]}
