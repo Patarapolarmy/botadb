@@ -98,7 +98,6 @@ app.post('/api/get-commands', checkApiKeyAndIP, (req, res) => {
     }
         
 
-
 });
 
 app.get('/', (req, res) => {
