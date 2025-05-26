@@ -30,7 +30,7 @@ function checkApiKeyAndIP(req, res, next) {
 }
 
 // === Protected route ===
-app.get('/api/status', checkApiKeyAndIP, (req, res) => {
+app.post('/api/status', checkApiKeyAndIP, (req, res) => {
   const ipRaw = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const ip = ipRaw.includes(',') ? ipRaw.split(',')[0].trim() : ipRaw.replace(/^::ffff:/, '');
   res.json({
