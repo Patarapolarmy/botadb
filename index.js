@@ -10,7 +10,7 @@ const API_KEYS = [
   'key-demo-789'
 ];
 
-const ALLOWED_IPS = ['127.0.0.1', '1.2.3.4'];
+const ALLOWED_IPS = ['127.0.0.1', '1.2.3.4','104.28.214.144'];
 
 // === Middleware ตรวจสอบ API Key และ IP ===
 function checkApiKeyAndIP(req, res, next) {
