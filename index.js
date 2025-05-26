@@ -5,7 +5,7 @@ const port = process.env.PORT || 3000;
 
 // === ตั้งค่า ===
 const API_KEYS = [
-  'key-abc-123',
+  '9e4609b2-c052-41c7-b7bc-94df2ae9a0ea',
   'key-xyz-456',
   'key-demo-789'
 ];
