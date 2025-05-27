@@ -45,7 +45,7 @@ app.post('/api/get-token', checkApiKeyAndIP, (req, res) => {
         time: Date.now()
   };
   // สร้าง token (มีอายุ 10 นาที)
-  const accessToken = jwt.sign(payload, secret, { expiresIn: '12h' });
+  const accessToken = jwt.sign(payload, secret, { expiresIn: '24h' });
   res.json({
     status: 'true',
     message: 'API is running',
