@@ -11,7 +11,7 @@ const API_KEYS = [
   '9e4609b2-c052-41c7-b7bc-94df2ae9a0ea',
 ];
 
-const ALLOWED_IPS = ['127.0.0.1','104.28.214.144','125.26.172.184'];
+// const ALLOWED_IPS = ['127.0.0.1','104.28.214.144','125.26.172.184'];
 
 
 
@@ -25,9 +25,9 @@ function checkApiKeyAndIP(req, res, next) {
     return res.status(401).json({ error: 'Unauthorized - Invalid API Key' });
   }
 
-  if (!ALLOWED_IPS.includes(ip)) {
-    return res.status(403).json({ error: `Forbidden - IP ${ip} is not allowed` });
-  }
+  // if (!ALLOWED_IPS.includes(ip)) {
+  //   return res.status(403).json({ error: `Forbidden - IP ${ip} is not allowed` });
+  // }
 
   next();
 }
