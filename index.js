@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const secret = 'k9xarmy1234567890'; // ควรเก็บไว้ใน .env
 const port = process.env.PORT || 3000;
 
@@ -102,10 +103,23 @@ app.post('/api/get-commands', checkApiKeyAndIP, (req, res) => {
 
 
 app.post('/api/open', checkApiKeyAndIP, (req, res) => {
-  res.json({
+  // จำลองข้อมูลที่อาจมีการเปลี่ยนแปลงในอนาคต
+  const data = {
     status: 'true',
     message: 'API is running'
-  });
+  };
+
+  // สร้าง ETag จากเนื้อหา
+  const etag = crypto.createHash('md5').update(JSON.stringify(data)).digest('hex');
+
+  // ตรวจสอบ If-None-Match
+  if (req.headers['if-none-match'] === etag) {
+    return res.status(304).end(); // ไม่ต้องส่งข้อมูลซ้ำ
+  }
+
+  // ตอบพร้อม ETag
+  res.set('ETag', etag);
+  res.json(data);
 });
 
 app.get('/', (req, res) => {
