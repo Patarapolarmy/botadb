@@ -100,6 +100,14 @@ app.post('/api/get-commands', checkApiKeyAndIP, (req, res) => {
 
 });
 
+
+app.post('/api/open', checkApiKeyAndIP, (req, res) => {
+  res.json({
+    status: 'true',
+    message: 'API is running'
+  });
+});
+
 app.get('/', (req, res) => {
   res.send('OK');
 });
