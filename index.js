@@ -105,7 +105,7 @@ app.post('/api/get-commands', checkApiKeyAndIP, (req, res) => {
 app.post('/api/open', checkApiKeyAndIP, (req, res) => {
   // จำลองข้อมูลที่อาจมีการเปลี่ยนแปลงในอนาคต
   const data = {
-    status: 'false',
+    status: 'true',
     message: 'API is running'
   };
 
