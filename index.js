@@ -22,7 +22,7 @@ function clientIp(req) {
 app.post('/api/get-token', checkApiKey, (req, res) => {
   const ip = clientIp(req);
   const key = req.header('x-api-key');
-  const accessToken = jwt.sign({ key, ip, time: Date.now() }, secret, { expiresIn: '24h' });
+  const accessToken = jwt.sign({ key, ip, time: Date.now() }, secret, { expiresIn: '24h', audience: 'bot' });
   res.json({
     status: 'true',
     message: 'API is running',

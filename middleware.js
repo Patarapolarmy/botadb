@@ -18,6 +18,10 @@ function checkApiKey(req, res, next) {
   next();
 }
 
+// token audiences keep bot tokens and admin sessions from being used for each other
+const AUD_BOT = 'bot';
+const AUD_ADMIN = 'admin';
+
 // Bearer JWT for bot routes; sets req.jwt
 function checkJwt(req, res, next) {
   const auth = req.header('authorization');
@@ -26,7 +30,7 @@ function checkJwt(req, res, next) {
   }
   const token = auth.slice(7);
   try {
-    req.jwt = jwt.verify(token, process.env.JWT_SECRET);
+    req.jwt = jwt.verify(token, process.env.JWT_SECRET, { audience: AUD_BOT, algorithms: ['HS256'] });
     next();
   } catch {
     return res.status(401).json({ error: 'Invalid or expired token' });
@@ -38,11 +42,15 @@ function requireAdmin(req, res, next) {
   const token = req.cookies && req.cookies.token;
   if (!token) return res.status(401).json({ error: 'Not authenticated' });
   try {
-    req.admin = jwt.verify(token, process.env.JWT_SECRET);
+    const payload = jwt.verify(token, process.env.JWT_SECRET, { audience: AUD_ADMIN, algorithms: ['HS256'] });
+    if (payload.role !== 'admin' || typeof payload.uid !== 'number') {
+      return res.status(401).json({ error: 'Invalid session' });
+    }
+    req.admin = payload;
     next();
   } catch {
     return res.status(401).json({ error: 'Invalid session' });
   }
 }
 
-module.exports = { checkApiKey, checkJwt, requireAdmin };
+module.exports = { checkApiKey, checkJwt, requireAdmin, AUD_BOT, AUD_ADMIN };

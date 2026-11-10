@@ -50,7 +50,7 @@ test('requireAdmin rejects missing cookie with 401', () => {
 test('requireAdmin passes a valid admin cookie', () => {
   const res = mockRes();
   let nextCalled = false;
-  const token = jwt.sign({ uid: 1, role: 'admin' }, process.env.JWT_SECRET);
+  const token = jwt.sign({ uid: 1, role: 'admin' }, process.env.JWT_SECRET, { audience: 'admin' });
   const req = { cookies: { token } };
   requireAdmin(req, res, () => { nextCalled = true; });
   assert.strictEqual(nextCalled, true);
@@ -63,4 +63,31 @@ test('checkJwt rejects missing Bearer with 401', () => {
   checkJwt({ header: () => undefined }, res, () => { nextCalled = true; });
   assert.strictEqual(res.code, 401);
   assert.strictEqual(nextCalled, false);
+});
+
+test('requireAdmin rejects a bot-audience token (token confusion)', () => {
+  const res = mockRes();
+  let n = false;
+  const botToken = jwt.sign({ key: 'k', ip: '1.2.3.4', time: 1 }, process.env.JWT_SECRET, { audience: 'bot' });
+  requireAdmin({ cookies: { token: botToken } }, res, () => { n = true; });
+  assert.strictEqual(res.code, 401);
+  assert.strictEqual(n, false);
+});
+
+test('checkJwt rejects an admin-audience token (token confusion)', () => {
+  const res = mockRes();
+  let n = false;
+  const adminToken = jwt.sign({ uid: 1, role: 'admin' }, process.env.JWT_SECRET, { audience: 'admin' });
+  checkJwt({ header: () => `Bearer ${adminToken}` }, res, () => { n = true; });
+  assert.strictEqual(res.code, 401);
+  assert.strictEqual(n, false);
+});
+
+test('requireAdmin rejects a token without role=admin', () => {
+  const res = mockRes();
+  let n = false;
+  const noRole = jwt.sign({ uid: 2 }, process.env.JWT_SECRET, { audience: 'admin' });
+  requireAdmin({ cookies: { token: noRole } }, res, () => { n = true; });
+  assert.strictEqual(res.code, 401);
+  assert.strictEqual(n, false);
 });

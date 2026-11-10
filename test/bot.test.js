@@ -9,7 +9,7 @@ const app = require('../index');
 const { prisma } = require('../db');
 
 const KEY = 'test-key';
-const TOKEN = jwt.sign({ key: KEY, ip: '1.2.3.4', time: Date.now() }, process.env.JWT_SECRET);
+const TOKEN = jwt.sign({ key: KEY, ip: '1.2.3.4', time: Date.now() }, process.env.JWT_SECRET, { audience: 'bot' });
 const auth = (r) => r.set('x-api-key', KEY).set('authorization', `Bearer ${TOKEN}`);
 const serial = 'TEST-' + Math.random().toString(36).slice(2, 10);
 
