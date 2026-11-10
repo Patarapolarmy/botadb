@@ -62,4 +62,28 @@ router.post('/log', checkApiKey, checkJwt, async (req, res) => {
   }
 });
 
+// POST /api/phone-report — app (phone-side) hourly report + one GpsPing
+router.post('/phone-report', checkApiKey, async (req, res) => {
+  const { serial, model, brand, androidVersion, battery, wifiSsid, wifiIp, lat, lng, accuracy } = req.body || {};
+  if (!serial || lat === undefined || lng === undefined) {
+    return res.status(400).json({ error: 'Missing serial/lat/lng' });
+  }
+  const fields = {};
+  for (const [k, v] of Object.entries({ model, brand, androidVersion, battery, wifiSsid, wifiIp })) {
+    if (v !== undefined) fields[k] = v;
+  }
+  try {
+    let device;
+    try {
+      device = await upsertDevice(serial, fields);
+    } catch (e) {
+      device = await upsertDevice(serial, fields); // retry once on unique-constraint race
+    }
+    await prisma.gpsPing.create({ data: { deviceId: device.id, lat, lng, accuracy: accuracy ?? undefined } });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: 'phone-report failed' });
+  }
+});
+
 module.exports = router;
