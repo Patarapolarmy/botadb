@@ -1,0 +1,8 @@
+node_modules/
+.next/
+.env*.local
+.env
+!.env.example
+seed-result.json
+merchant-credentials.txt
+demo-credentials.txt

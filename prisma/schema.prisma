@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model AppUser {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  role         String   @default("admin")
+  createdAt    DateTime @default(now())
+}
+
+model Device {
+  id             Int         @id @default(autoincrement())
+  serial         String      @unique
+  name           String?
+  botVersion     String?
+  publicIp       String?
+  localIp        String?
+  pcLocation     String?
+  pcIsp          String?
+  model          String?
+  brand          String?
+  androidVersion String?
+  battery        Int?
+  wifiSsid       String?
+  wifiIp         String?
+  firstSeen      DateTime    @default(now())
+  lastSeen       DateTime    @updatedAt
+  logs           DeviceLog[]
+  gpsPings       GpsPing[]
+}
+
+model DeviceLog {
+  id        Int      @id @default(autoincrement())
+  device    Device   @relation(fields: [deviceId], references: [id])
+  deviceId  Int
+  level     String   @default("info")
+  message   String
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  @@index([deviceId, createdAt])
+}
+
+model GpsPing {
+  id        Int      @id @default(autoincrement())
+  device    Device   @relation(fields: [deviceId], references: [id])
+  deviceId  Int
+  lat       Float
+  lng       Float
+  accuracy  Float?
+  createdAt DateTime @default(now())
+
+  @@index([deviceId, createdAt])
+}
