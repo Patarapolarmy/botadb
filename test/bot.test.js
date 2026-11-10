@@ -47,6 +47,15 @@ test('POST /api/log with a new serial creates Device + DeviceLog', async () => {
   assert.strictEqual(dev.logs[0].message, 'bot started');
 });
 
+test('POST /api/log coerces an unknown level to info', async () => {
+  const res = await auth(request(app).post('/api/log'))
+    .send({ serial, level: '<script>alert(1)</script>', message: 'x' });
+  assert.strictEqual(res.status, 200);
+  const dev = await prisma.device.findUnique({ where: { serial }, include: { logs: true } });
+  const last = dev.logs[dev.logs.length - 1];
+  assert.strictEqual(last.level, 'info');
+});
+
 test('POST /api/report upserts device bot fields', async () => {
   const res = await auth(request(app).post('/api/report'))
     .send({ serial, botVersion: '5.0.0', publicIp: '9.9.9.9' });

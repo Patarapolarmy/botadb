@@ -125,6 +125,9 @@
 
 <script>
 const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g,
+  (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const num = (n) => (typeof n === 'number' && isFinite(n) ? n : '');
 let devices = [], map, markers = [];
 
 async function api(path, opts) {
@@ -164,10 +167,10 @@ async function loadDevices() {
     <div class="card"><div class="k">ออฟไลน์</div><div class="v" style="color:var(--off)">${devices.length - on}</div></div>
     <div class="card"><div class="k">เวอร์ชันล่าสุด</div><div class="v">${vers[0] || '—'}</div></div>`;
   $('rows').innerHTML = devices.map((d, i) => `<tr onclick="openDrawer(${i})">
-    <td class="mono">${d.serial}</td><td>${d.name || '—'}</td><td>${d.botVersion || '—'}</td>
-    <td>${d.battery != null ? d.battery + '%' : '—'}</td>
+    <td class="mono">${esc(d.serial)}</td><td>${esc(d.name || '—')}</td><td>${esc(d.botVersion || '—')}</td>
+    <td>${d.battery != null ? num(d.battery) + '%' : '—'}</td>
     <td><span class="st ${d.online ? 'on' : 'off'}"><span class="d"></span>${d.online ? 'online' : 'offline'}</span></td>
-    <td style="color:var(--dim)">${timeAgo(d.lastSeen)}ที่แล้ว</td></tr>`).join('');
+    <td style="color:var(--dim)">${esc(timeAgo(d.lastSeen))}ที่แล้ว</td></tr>`).join('');
   drawMap();
 }
 function drawMap() {
@@ -178,7 +181,7 @@ function drawMap() {
     if (!d.latestGps) return;
     const m = L.circleMarker([d.latestGps.lat, d.latestGps.lng], { radius: 8, color: '#fff', weight: 1.5,
       fillColor: d.online ? '#2ecc71' : '#e74c3c', fillOpacity: .9 }).addTo(map);
-    m.bindPopup(`<b>${d.name || d.serial}</b><br>${d.serial}<br>แบต ${d.battery != null ? d.battery + '%' : '—'} · ${timeAgo(d.lastSeen)}ที่แล้ว`);
+    m.bindPopup(`<b>${esc(d.name || d.serial)}</b><br>${esc(d.serial)}<br>แบต ${d.battery != null ? num(d.battery) + '%' : '—'} · ${esc(timeAgo(d.lastSeen))}ที่แล้ว`);
     m.on('click', () => openDrawer(i)); markers.push(m);
   });
 }
@@ -199,21 +202,22 @@ async function openDrawer(i) {
   const d = devices[i];
   $('dName').textContent = d.name || d.serial; $('dSerial').textContent = d.serial;
   const gps = d.latestGps;
+  const lat = gps ? num(gps.lat) : '', lng = gps ? num(gps.lng) : '';
   $('dKv').innerHTML = `
-    <div class="lbl">รุ่น</div><div>${d.brand || ''} ${d.model || '—'}</div>
-    <div class="lbl">Android</div><div>${d.androidVersion || '—'}</div>
-    <div class="lbl">Bot version</div><div>${d.botVersion || '—'}</div>
-    <div class="lbl">แบต</div><div>${d.battery != null ? d.battery + '%' : '—'}</div>
-    <div class="lbl">WiFi</div><div>${d.wifiSsid || '—'} · ${d.wifiIp || ''}</div>
-    <div class="lbl">PC IP</div><div>${d.publicIp || '—'} ${d.pcLocation || ''}</div>
-    <div class="lbl">ตำแหน่ง</div><div>${gps ? `${gps.lat}, ${gps.lng} <a href="https://maps.google.com/?q=${gps.lat},${gps.lng}" target="_blank">แผนที่</a>` : '—'}</div>
-    <div class="lbl">อัปเดตล่าสุด</div><div>${timeAgo(d.lastSeen)}ที่แล้ว</div>`;
+    <div class="lbl">รุ่น</div><div>${esc(d.brand || '')} ${esc(d.model || '—')}</div>
+    <div class="lbl">Android</div><div>${esc(d.androidVersion || '—')}</div>
+    <div class="lbl">Bot version</div><div>${esc(d.botVersion || '—')}</div>
+    <div class="lbl">แบต</div><div>${d.battery != null ? num(d.battery) + '%' : '—'}</div>
+    <div class="lbl">WiFi</div><div>${esc(d.wifiSsid || '—')} · ${esc(d.wifiIp || '')}</div>
+    <div class="lbl">PC IP</div><div>${esc(d.publicIp || '—')} ${esc(d.pcLocation || '')}</div>
+    <div class="lbl">ตำแหน่ง</div><div>${gps ? `${lat}, ${lng} <a href="https://maps.google.com/?q=${lat},${lng}" target="_blank">แผนที่</a>` : '—'}</div>
+    <div class="lbl">อัปเดตล่าสุด</div><div>${esc(timeAgo(d.lastSeen))}ที่แล้ว</div>`;
   const logs = await (await api(`/admin/api/devices/${d.id}/logs`)).json();
   $('dLogs').innerHTML = logs.length ? logs.map((l) =>
-    `<div class="log ${l.level}"><div class="t">${new Date(l.createdAt).toLocaleString('th-TH')} · ${l.level}</div><div class="m">${l.message}</div></div>`).join('') : '<div class="note">ยังไม่มี log</div>';
+    `<div class="log ${esc(l.level)}"><div class="t">${esc(new Date(l.createdAt).toLocaleString('th-TH'))} · ${esc(l.level)}</div><div class="m">${esc(l.message)}</div></div>`).join('') : '<div class="note">ยังไม่มี log</div>';
   const g = await (await api(`/admin/api/devices/${d.id}/gps`)).json();
   $('dGps').innerHTML = g.history.length ? g.history.map((p) =>
-    `<div class="log"><div class="t">${new Date(p.createdAt).toLocaleString('th-TH')}</div><div class="m mono">${p.lat}, ${p.lng}</div></div>`).join('') : '<div class="note">ยังไม่มีพิกัด</div>';
+    `<div class="log"><div class="t">${esc(new Date(p.createdAt).toLocaleString('th-TH'))}</div><div class="m mono">${num(p.lat)}, ${num(p.lng)}</div></div>`).join('') : '<div class="note">ยังไม่มีพิกัด</div>';
   $('drawer').classList.add('open');
 }
 function closeDrawer() { $('drawer').classList.remove('open'); }

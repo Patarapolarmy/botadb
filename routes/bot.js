@@ -51,10 +51,11 @@ router.post('/report', checkApiKey, checkJwt, async (req, res) => {
 router.post('/log', checkApiKey, checkJwt, async (req, res) => {
   const { serial, level, message, payload } = req.body || {};
   if (!serial || !message) return res.status(400).json({ error: 'Missing serial or message' });
+  const lvl = ['info', 'system', 'error'].includes(level) ? level : 'info';
   try {
     const device = await upsertDevice(serial, {});
     await prisma.deviceLog.create({
-      data: { deviceId: device.id, level: level || 'info', message, payload: payload ?? undefined },
+      data: { deviceId: device.id, level: lvl, message: String(message).slice(0, 2000), payload: payload ?? undefined },
     });
     res.json({ ok: true });
   } catch (e) {
