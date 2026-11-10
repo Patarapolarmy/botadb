@@ -66,8 +66,8 @@ router.post('/log', checkApiKey, checkJwt, async (req, res) => {
 // POST /api/phone-report — app (phone-side) hourly report + one GpsPing
 router.post('/phone-report', checkApiKey, async (req, res) => {
   const { serial, model, brand, androidVersion, battery, wifiSsid, wifiIp, lat, lng, accuracy } = req.body || {};
-  if (!serial || lat === undefined || lng === undefined) {
-    return res.status(400).json({ error: 'Missing serial/lat/lng' });
+  if (!serial || !Number.isFinite(lat) || !Number.isFinite(lng)) {
+    return res.status(400).json({ error: 'Missing serial or non-numeric lat/lng' });
   }
   const fields = {};
   for (const [k, v] of Object.entries({ model, brand, androidVersion, battery, wifiSsid, wifiIp })) {

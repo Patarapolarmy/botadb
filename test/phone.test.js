@@ -37,6 +37,12 @@ test('POST /api/phone-report with new serial creates Device + one GpsPing', asyn
   assert.strictEqual(dev.gpsPings.length, 1);
 });
 
+test('phone-report with non-numeric lat/lng returns 400 (no crash)', async () => {
+  const res = await request(app).post('/api/phone-report').set('x-api-key', KEY)
+    .send({ serial, lat: 'abc', lng: null });
+  assert.strictEqual(res.status, 400);
+});
+
 test('second phone-report appends a second GpsPing to same device', async () => {
   await request(app).post('/api/phone-report').set('x-api-key', KEY)
     .send({ serial, lat: 13.76, lng: 100.51 });
