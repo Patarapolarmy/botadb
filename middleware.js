@@ -1,9 +1,18 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
-// API key for bot + app routes (env-driven)
+// constant-time string compare; false unless both are equal non-empty strings
+function safeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length === 0 || a.length !== b.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+}
+
+// API key for bot + app routes (env-driven, fail-closed)
 function checkApiKey(req, res, next) {
   const key = req.header('x-api-key');
-  if (key !== process.env.API_KEY) {
+  if (!safeEqual(key, process.env.API_KEY)) {
     return res.status(401).json({ error: 'Unauthorized - Invalid API Key' });
   }
   next();

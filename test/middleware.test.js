@@ -23,6 +23,14 @@ test('checkApiKey rejects wrong key with 401', () => {
   assert.strictEqual(nextCalled, false);
 });
 
+test('checkApiKey fails closed when API_KEY env empty', () => {
+  const saved = process.env.API_KEY; process.env.API_KEY = '';
+  const res = mockRes(); let n = false;
+  checkApiKey({ header: () => '', headers: {}, socket: {} }, res, () => { n = true; });
+  process.env.API_KEY = saved;
+  assert.strictEqual(res.code, 401); assert.strictEqual(n, false);
+});
+
 test('checkApiKey passes correct key', () => {
   const res = mockRes();
   let nextCalled = false;
