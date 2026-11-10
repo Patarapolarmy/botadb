@@ -25,5 +25,8 @@
   },
   "prisma": {
     "seed": "node prisma/seed.js"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.2"
   }
 }
