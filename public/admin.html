@@ -240,3 +240,6 @@ $('lpass').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin()
 async function boot() { try { await loadDevices(); await loadConfig(); } catch (e) {} }
 // initial: probe auth
 api('/admin/api/devices').then(() => { hideLogin(); boot(); }).catch(() => {});
+</script>
+</body>
+</html>
