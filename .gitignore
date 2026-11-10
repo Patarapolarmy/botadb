@@ -6,3 +6,6 @@ node_modules/
 seed-result.json
 merchant-credentials.txt
 demo-credentials.txt
+
+.env.production
+admin-credentials.txt
