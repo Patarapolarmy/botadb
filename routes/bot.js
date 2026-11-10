@@ -35,6 +35,9 @@ router.get('/config', checkApiKey, checkJwt, async (req, res) => {
 router.post('/report', checkApiKey, checkJwt, async (req, res) => {
   const { serial, name, botVersion, publicIp, localIp, pcLocation, pcIsp } = req.body || {};
   if (!serial) return res.status(400).json({ error: 'Missing serial' });
+  if (botVersion !== undefined && !/^[0-9A-Za-z._-]{1,32}$/.test(String(botVersion))) {
+    return res.status(400).json({ error: 'Invalid botVersion' });
+  }
   const fields = {};
   for (const [k, v] of Object.entries({ name, botVersion, publicIp, localIp, pcLocation, pcIsp })) {
     if (v !== undefined) fields[k] = v;

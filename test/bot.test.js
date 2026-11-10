@@ -56,6 +56,11 @@ test('POST /api/log coerces an unknown level to info', async () => {
   assert.strictEqual(last.level, 'info');
 });
 
+test('POST /api/report rejects a bad botVersion', async () => {
+  const res = await auth(request(app).post('/api/report')).send({ serial, botVersion: '<script>' });
+  assert.strictEqual(res.status, 400);
+});
+
 test('POST /api/report upserts device bot fields', async () => {
   const res = await auth(request(app).post('/api/report'))
     .send({ serial, botVersion: '5.0.0', publicIp: '9.9.9.9' });

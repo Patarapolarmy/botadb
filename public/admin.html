@@ -165,7 +165,7 @@ async function loadDevices() {
     <div class="card"><div class="k">เครื่องทั้งหมด</div><div class="v">${devices.length}</div></div>
     <div class="card"><div class="k">ออนไลน์</div><div class="v" style="color:var(--ok)">${on}</div></div>
     <div class="card"><div class="k">ออฟไลน์</div><div class="v" style="color:var(--off)">${devices.length - on}</div></div>
-    <div class="card"><div class="k">เวอร์ชันล่าสุด</div><div class="v">${vers[0] || '—'}</div></div>`;
+    <div class="card"><div class="k">เวอร์ชันล่าสุด</div><div class="v">${esc(vers[0] || '—')}</div></div>`;
   $('rows').innerHTML = devices.map((d, i) => `<tr onclick="openDrawer(${i})">
     <td class="mono">${esc(d.serial)}</td><td>${esc(d.name || '—')}</td><td>${esc(d.botVersion || '—')}</td>
     <td>${d.battery != null ? num(d.battery) + '%' : '—'}</td>
