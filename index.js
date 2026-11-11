@@ -61,8 +61,15 @@ app.post('/api/open', checkApiKey, (req, res) => {
 // === bot + app + admin routers ===
 app.use('/api', require('./routes/bot'));
 app.use('/admin', require('./routes/admin'));
-app.use(express.static('public'));
-app.get('/admin', (req, res) => res.sendFile(require('path').join(__dirname, 'public', 'admin.html')));
+app.use(express.static('public', {
+  setHeaders: (res, p) => {
+    if (p.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  },
+}));
+app.get('/admin', (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(require('path').join(__dirname, 'public', 'admin.html'));
+});
 
 app.get('/', (req, res) => res.send('OK'));
 
